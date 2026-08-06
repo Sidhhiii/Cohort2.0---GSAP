@@ -2,35 +2,60 @@ import './App.css'
 import React, { useEffect } from 'react'
 import gsap  from 'gsap'
 import SplitText from 'gsap/SplitText'
+import ScrambleTextPlugin from 'gsap/ScrambleTextPlugin'
 
 const App = () => {
 
-  gsap.registerPlugin(SplitText);
+  gsap.registerPlugin(SplitText, ScrambleTextPlugin);
+
 
   useEffect(() => {
 
-    let split = new SplitText(".title",{
-       type: "lines, words, chars",
-       onSplit: (self) => {
-          gsap.from(self.chars, {
-            duration: 0.8,
-            opacity: 0,
-            rotateX: 180,
-            y: 100,
-            stagger: {
-              each: 0.1,
-              from: "start",
-              ease: "power1.in",
-            }
-          })
+    const split = SplitText.create(".title",{
+      type:"chars",
+      onSplit: function(self){
+
+        const tl = gsap.timeline();
+        tl.from(self.chars,{
+          duration: 0.5,
+          opacity: 0,
+          y: 80,
+          stagger: 0.05,
+          ease: "back.out(1.7)"
+        }).to(".scramble",{
+          duration: 1,
+          scrambleText: {
+            text: "SIDDHI GAVHANE", 
+            chars: "upperCaseandLowerCase0123456789", 
+            newClass: "scrambled",
+            revealDelay: 0.5, 
+            speed: 0.6, 
+            ease: "none"
           }
-       })
-      },[]);
+        })
+
+        let typedSplit = SplitText.create(".typed",{
+          type: "chars",
+          onSplit: function(self){
+            console.log(self.chars);
+            
+            tl.from(self.chars,{
+              duration: 0.4,
+              opacity: 0,
+              // y:20,
+              stagger: 0.05
+            })
+          }
+        })
+      }
+    })
+  },[]);
 
   return (
     <div className='App'>
       <div className="mask">
-        <h1 className='title'>hello world</h1>
+        <h1 className='title'>Hello world, I am <span className='scramble'>Someone</span></h1>
+        <p className="typed">Full-stack dev. Semicolon enthusiast. Occasional wizard.</p>
       </div>
     </div>
   )
